@@ -40,6 +40,7 @@ GPoint rotate_point(int angle, int radius, GPoint center) {
 #define FIFTEEN_MARK_LENGTH 5
 
 void minute_dial_update(Layer *layer, GContext* gctx) {
+  static char minute_text[] = "59";
   graphics_context_set_stroke_color(gctx, FOREGROUND);
   GPoint center = grect_center_point(&layer->frame);
   for (int angle=0; angle < 60; angle++){
@@ -55,19 +56,24 @@ void minute_dial_update(Layer *layer, GContext* gctx) {
     GPoint outer=rotate_point(angle, radius, center);
     GPoint inner=rotate_point(angle, radius - length, center);
     graphics_draw_line (gctx, outer, inner);
-  }
-  for (int hour=0; hour<12; hour++){
-    
+
+    if(angle % 5 == 0) {
+      GPoint text_center=rotate_point(angle, radius - FIFTEEN_MARK_LENGTH - 10 , center);
+      snprintf(minute_text, sizeof(minute_text), "%02d", angle);
+      graphics_text_draw(gctx, minute_text, fonts_get_system_font(FONT_KEY_GOTHIC_14),
+			 GRect(text_center.x - 10, text_center.y - 9, 20, 14),
+			 GTextOverflowModeWordWrap, GTextAlignmentCenter, NULL);    
+    }
   }
 }
 
 GPath minute_hand_path;
 
 void minute_hand_update(Layer *layer, GContext* gctx) {
-  //graphics_context_set_fill_color(gctx, FOREGROUND);
-  //graphics_context_set_stroke_color(gctx, BACKGROUND);
-  graphics_context_set_fill_color(gctx, BACKGROUND);
-  graphics_context_set_stroke_color(gctx, FOREGROUND);
+  graphics_context_set_fill_color(gctx, FOREGROUND);
+  graphics_context_set_stroke_color(gctx, BACKGROUND);
+  //graphics_context_set_fill_color(gctx, BACKGROUND);
+  //graphics_context_set_stroke_color(gctx, FOREGROUND);
   PblTm time;
   get_time(&time);
   gpath_rotate_to(&minute_hand_path, TRIG_MAX_ANGLE * time.tm_min / 60);
