@@ -1,0 +1,6 @@
+#!/bin/sh
+
+cd build
+python -m SimpleHTTPServer 8000
+
+
