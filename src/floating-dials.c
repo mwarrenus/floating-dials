@@ -4,8 +4,20 @@
 
 #include "config.h" // from build-all
 
-#define APP_NAME "Floating Dials"
+#ifndef TWENTYFOUR
 #define MY_UUID { 0xA7, 0x13, 0xC7, 0x01, 0x7B, 0xB1, 0x4E, 0x19, 0x9B, 0xEF, 0x5A, 0xF2, 0x15, 0xD6, 0xFC, 0x51 }
+#define APP_NAME "Floating Dials"
+#define MAX_HOURS 12
+#define MAX_HOURS_LABEL 12
+#define HOUR_DIVISOR 2
+#else
+#define MY_UUID { 0xA7, 0x13, 0xC7, 0x01, 0x7B, 0xB1, 0x4E, 0x19, 0x9B, 0xEF, 0x5A, 0xF2, 0x15, 0xD6, 0xFC, 0x52 }
+#define APP_NAME "Floating Dials (24h)"
+#define MAX_HOURS 24
+#define MAX_HOURS_LABEL 0
+#define HOUR_DIVISOR 1
+#define HOUR_COUNTER 3
+#endif
 PBL_APP_INFO(MY_UUID, APP_NAME " " VERSION, "Koishi", MAJOR, MINOR, 
              RESOURCE_ID_IMAGE_MENU_ICON, 
              APP_INFO_WATCH_FACE);
@@ -42,8 +54,8 @@ GPoint rotate_point(int angle, int max, int radius, GPoint center) {
 #define THREE_MARK_LENGTH FIFTEEN_MARK_LENGTH
 #define ONE_MARK_LENGTH FIVE_MARK_LENGTH
 #define HOUR_BORDER 1
-#define HOUR_DIVISOR 2
-#define DIVISOR_MARK_LENGTH 0;
+#define DIVISOR_MARK_LENGTH 0
+#define HOUR_MARKS 4
 
 void hour_dial_update(Layer *layer, GContext* gctx) {
   static char hour_text[] = "12";
@@ -53,22 +65,27 @@ void hour_dial_update(Layer *layer, GContext* gctx) {
   graphics_fill_circle(gctx, center, radius);
   radius -= HOUR_BORDER;
   graphics_context_set_stroke_color(gctx, FOREGROUND);
-  for (int angle=0; angle < 12 * HOUR_DIVISOR; angle++){
+  for (int angle=0; angle < MAX_HOURS * HOUR_DIVISOR; angle++){
     int32_t length;
-    if(angle % (3 * HOUR_DIVISOR) == 0) {
+    if(angle % ((MAX_HOURS / HOUR_MARKS) * HOUR_DIVISOR) == 0) {
       length = THREE_MARK_LENGTH;
-    } else if(angle % HOUR_DIVISOR == 0) {
+    } else
+#ifndef TWENTYFOUR 
+      if(angle % HOUR_DIVISOR == 0) {
+#else
+      if(angle % HOUR_COUNTER == 0) {
+#endif
       length = ONE_MARK_LENGTH;
     } else {
       length = DIVISOR_MARK_LENGTH;
     }
-    GPoint outer=rotate_point(angle, 12 * HOUR_DIVISOR, radius, center);
-    GPoint inner=rotate_point(angle, 12 * HOUR_DIVISOR, radius - length, center);
+    GPoint outer=rotate_point(angle, MAX_HOURS * HOUR_DIVISOR, radius, center);
+    GPoint inner=rotate_point(angle, MAX_HOURS * HOUR_DIVISOR, radius - length, center);
     graphics_draw_line(gctx, outer, inner);
 
-    if (angle % (3 * HOUR_DIVISOR) == 0) {
-      GPoint text_center=rotate_point(angle, 12 * HOUR_DIVISOR, radius - THREE_MARK_LENGTH - 10 , center);
-      snprintf(hour_text, sizeof(hour_text), "%2d", angle?angle / HOUR_DIVISOR:12);
+    if (angle % (((MAX_HOURS / HOUR_MARKS)) * HOUR_DIVISOR) == 0) {
+      GPoint text_center=rotate_point(angle, MAX_HOURS * HOUR_DIVISOR, radius - THREE_MARK_LENGTH - 10 , center);
+      snprintf(hour_text, sizeof(hour_text), "%2d", angle?angle / HOUR_DIVISOR:MAX_HOURS_LABEL);
       graphics_text_draw(gctx, hour_text, fonts_get_system_font(FONT_KEY_GOTHIC_14),
 			 GRect(text_center.x - 10, text_center.y - 9, 20, 14),
 			 GTextOverflowModeWordWrap, GTextAlignmentCenter, NULL);    
@@ -139,7 +156,7 @@ void hour_hand_update(Layer *layer, GContext* gctx) {
   gpath_rotate_to(&hour_hand_path, TRIG_MAX_ANGLE * time.tm_sec / 60);
 #else
   //  gpath_rotate_to(&hour_hand_path, TRIG_MAX_ANGLE * ( (time.tm_hour + (time.tm_min / 60)) / 12 ) );
-  gpath_rotate_to(&hour_hand_path, (TRIG_MAX_ANGLE * (((time.tm_hour % 12) * 6) + (time.tm_min / 10))) / (12 * 6));
+  gpath_rotate_to(&hour_hand_path, (TRIG_MAX_ANGLE * (((time.tm_hour % MAX_HOURS) * 6) + (time.tm_min / 10))) / (MAX_HOURS * 6));
 #endif
   gpath_draw_filled(gctx, &hour_hand_path);
   gpath_draw_outline(gctx, &hour_hand_path);
