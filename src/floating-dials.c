@@ -65,6 +65,7 @@ void hour_dial_update(Layer *layer, GContext* gctx) {
   graphics_fill_circle(gctx, center, radius);
   radius -= HOUR_BORDER;
   graphics_context_set_stroke_color(gctx, FOREGROUND);
+  graphics_context_set_text_color(gctx, FOREGROUND);
   for (int angle=0; angle < MAX_HOURS * HOUR_DIVISOR; angle++){
     int32_t length;
     if(angle % ((MAX_HOURS / HOUR_MARKS) * HOUR_DIVISOR) == 0) {
@@ -97,6 +98,7 @@ void hour_dial_update(Layer *layer, GContext* gctx) {
 void minute_dial_update(Layer *layer, GContext* gctx) {
   static char minute_text[] = "59";
   graphics_context_set_stroke_color(gctx, FOREGROUND);
+  graphics_context_set_text_color(gctx, FOREGROUND);
   GPoint center = grect_center_point(&layer->frame);
   for (int angle=0; angle < 60; angle++){
     int32_t radius = MINUTE_RADIUS ;
