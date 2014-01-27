@@ -1,19 +1,12 @@
 #include <pebble.h>
 
-static Window *window;
-static Layer *minute_dial, *minute_hand, *hour_dial, *hour_hand, *second_dial, *second_hand;
-
-#define TWENTYFOUR true
+#include "config.h"
 
 #ifndef TWENTYFOUR
-//#define MY_UUID { 0xA7, 0x13, 0xC7, 0x01, 0x7B, 0xB1, 0x4E, 0x19, 0x9B, 0xEF, 0x5A, 0xF2, 0x15, 0xD6, 0xFC, 0x51 }
-//#define APP_NAME "Floating Dials"
 #define MAX_HOURS 12
 #define MAX_HOURS_LABEL 12
 #define HOUR_DIVISOR 2
 #else
-//#define MY_UUID { 0xA7, 0x13, 0xC7, 0x01, 0x7B, 0xB1, 0x4E, 0x19, 0x9B, 0xEF, 0x5A, 0xF2, 0x15, 0xD6, 0xFC, 0x52 }
-//#define APP_NAME "Floating Dials (24h)"
 #define MAX_HOURS 24
 #define MAX_HOURS_LABEL 0
 #define HOUR_DIVISOR 1
@@ -28,6 +21,8 @@ static Layer *minute_dial, *minute_hand, *hour_dial, *hour_hand, *second_dial, *
 #define FOREGROUND GColorBlack
 #endif
 
+static Window *window;
+static Layer *minute_dial, *minute_hand, *hour_dial, *hour_hand, *second_dial, *second_hand;
 
 GPoint rotate_point(int angle, int max, int radius, GPoint center) {
   GPoint point;
@@ -229,7 +224,7 @@ static void init(void) {
     .load = window_load,
     .unload = window_unload,
   });
-  //Layer *root_layer = window_get_root_layer(window);
+  window_set_background_color(window, BACKGROUND);
   const bool animated = true;
   window_stack_push(window, animated);
   tick_timer_service_subscribe(MINUTE_UNIT, handle_tick);
@@ -245,5 +240,5 @@ int main(void) {
   APP_LOG(APP_LOG_LEVEL_DEBUG, "Done initializing, pushed window: %p", window);
   app_event_loop();
   deinit();
-  return(0);
+  return(0 );
 }
