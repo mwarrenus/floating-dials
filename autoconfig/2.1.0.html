@@ -27,13 +27,6 @@
                 <option value="0">12h</option>
                 <option value="1">24h</option>
             </select>
-            <label for="seconds">Display Seconds:</label>
-            <select name="seconds" id="seconds" data-role="slider">
-                <option value="0">off</option>
-                <option value="1">on</option>
-            </select>
-            <label for="handwidth">Hands Width %:</label>
-            <input type="range" name="handwidth" id="handwidth" min="1" max="25">
             
         </div>
 	</div>
@@ -49,8 +42,6 @@
 				dictionary = {
 					"theme" : "0",
 					"hourdialtype" : "0",
-					"seconds" : "0",
-					"handwidth" : "25",
 					
 				};
 			}
@@ -60,12 +51,6 @@
 			}
 			if(dictionary['hourdialtype']) {
 				$('#hourdialtype').val(dictionary['hourdialtype'].toString()).slider('refresh');
-			}
-			if(dictionary['seconds']) {
-				$('#seconds').val(dictionary['seconds'].toString()).slider('refresh');
-			}
-			if(dictionary['handwidth']) {
-				$('#handwidth').val(dictionary['handwidth'].toString()).slider('refresh');
 			}
 			
 		});
@@ -79,14 +64,6 @@
     	  {
     	  	var field=document.getElementById('hourdialtype');
     	  	dictionary['hourdialtype'] = parseInt(field.value);
-    	  }
-    	  {
-    	  	var field=document.getElementById('seconds');
-    	  	dictionary['seconds'] = parseInt(field.value);
-    	  }
-    	  {
-    	  	var field=document.getElementById('handwidth');
-    	  	dictionary['handwidth'] = parseInt(field.value);
     	  }
     	  
     	  localStorage['Floating Dials'] = JSON.stringify(dictionary);
