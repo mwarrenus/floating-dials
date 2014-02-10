@@ -1,25 +1,10 @@
 #include <pebble.h>
+#include "autoconfig.h"
 
-#include "config.h"
+int HOURS;
 
-#ifndef TWENTYFOUR
-#define MAX_HOURS 12
-#define MAX_HOURS_LABEL 12
-#define HOUR_DIVISOR 2
-#else
-#define MAX_HOURS 24
-#define MAX_HOURS_LABEL 0
-#define HOUR_DIVISOR 1
-#define HOUR_COUNTER 3
-#endif
-
-#ifndef INVERTED
-#define BACKGROUND GColorBlack
-#define FOREGROUND GColorWhite
-#else
-#define BACKGROUND GColorWhite
-#define FOREGROUND GColorBlack
-#endif
+GColor BACKGROUND;
+GColor FOREGROUND;
 
 static Window *window;
 static Layer *minute_dial, *minute_hand, *hour_dial, *hour_hand, *second_dial, *second_hand;
@@ -44,6 +29,17 @@ GPoint rotate_point(int angle, int max, int radius, GPoint center) {
 #define HOUR_MARKS 4
 
 void hour_dial_update(Layer *layer, GContext* gctx) {
+  int MAX_HOURS_LABEL;
+  int HOUR_DIVISOR;
+  int HOUR_COUNTER;
+  if(HOURS == 12){
+    MAX_HOURS_LABEL=12;
+    HOUR_DIVISOR=2;
+  } else {
+    MAX_HOURS_LABEL=0;
+    HOUR_DIVISOR=1;
+    HOUR_COUNTER=3;
+  }
   static char hour_text[] = "12";
   GRect frame=layer_get_frame(layer);
   GPoint center = grect_center_point(&frame);
@@ -53,26 +49,26 @@ void hour_dial_update(Layer *layer, GContext* gctx) {
   radius -= HOUR_BORDER;
   graphics_context_set_stroke_color(gctx, FOREGROUND);
   graphics_context_set_text_color(gctx, FOREGROUND);
-  for (int angle=0; angle < MAX_HOURS * HOUR_DIVISOR; angle++){
+  for (int angle=0; angle < HOURS * HOUR_DIVISOR; angle++){
     int32_t length;
-    if(angle % ((MAX_HOURS / HOUR_MARKS) * HOUR_DIVISOR) == 0) {
+    if(angle % ((HOURS / HOUR_MARKS) * HOUR_DIVISOR) == 0) {
       length = THREE_MARK_LENGTH;
     } else
-#ifndef TWENTYFOUR 
-      if(angle % HOUR_DIVISOR == 0) {
-#else
-      if(angle % HOUR_COUNTER == 0) {
-#endif
+      if( 
+	 ( (HOURS == 12) && (angle % HOUR_DIVISOR == 0) )	\
+	 || \
+	 ( (HOURS == 24) && (angle % HOUR_COUNTER == 0) ) \
+        ) {
       length = ONE_MARK_LENGTH;
     } else {
       length = DIVISOR_MARK_LENGTH;
     }
-    GPoint outer=rotate_point(angle, MAX_HOURS * HOUR_DIVISOR, radius, center);
-    GPoint inner=rotate_point(angle, MAX_HOURS * HOUR_DIVISOR, radius - length, center);
+    GPoint outer=rotate_point(angle, HOURS * HOUR_DIVISOR, radius, center);
+    GPoint inner=rotate_point(angle, HOURS * HOUR_DIVISOR, radius - length, center);
     graphics_draw_line(gctx, outer, inner);
 
-    if (angle % (((MAX_HOURS / HOUR_MARKS)) * HOUR_DIVISOR) == 0) {
-      GPoint text_center=rotate_point(angle, MAX_HOURS * HOUR_DIVISOR, radius - THREE_MARK_LENGTH - 10 , center);
+    if (angle % (((HOURS / HOUR_MARKS)) * HOUR_DIVISOR) == 0) {
+      GPoint text_center=rotate_point(angle, HOURS * HOUR_DIVISOR, radius - THREE_MARK_LENGTH - 10 , center);
       snprintf(hour_text, sizeof(hour_text), "%2d", angle?angle / HOUR_DIVISOR:MAX_HOURS_LABEL);
       graphics_draw_text(gctx, hour_text, fonts_get_system_font(FONT_KEY_GOTHIC_14),
 			 GRect(text_center.x - 10, text_center.y - 9, 20, 14),
@@ -147,7 +143,7 @@ void hour_hand_update(Layer *layer, GContext* gctx) {
   gpath_rotate_to(hour_hand_path, TRIG_MAX_ANGLE * time->tm_sec / 60);
 #else
   //  gpath_rotate_to(hour_hand_path, TRIG_MAX_ANGLE * ( (time->tm_hour + (time->tm_min / 60)) / 12 ) );
-  gpath_rotate_to(hour_hand_path, (TRIG_MAX_ANGLE * (((time->tm_hour % MAX_HOURS) * 6) + (time->tm_min / 10))) / (MAX_HOURS * 6));
+  gpath_rotate_to(hour_hand_path, (TRIG_MAX_ANGLE * (((time->tm_hour % HOURS) * 6) + (time->tm_min / 10))) / (HOURS * 6));
 #endif
   gpath_draw_filled(gctx, hour_hand_path);
   gpath_draw_outline(gctx, hour_hand_path);
@@ -214,10 +210,33 @@ static void window_unload(Window *window) {
   layer_destroy(second_hand);
   gpath_destroy(hour_hand_path);
   gpath_destroy(minute_hand_path);
+}
 
+static void in_received_handler(DictionaryIterator *iter, void *context) {
+  autoconf_in_received_handler(iter, context);
+  APP_LOG(APP_LOG_LEVEL_DEBUG, "in_received_handler theme:%d seconds:%d hourdialtype:%d handwidth:%d", getTheme(), getSeconds(), getHourdialtype(), (int)getHandwidth());
+
+  //update display
 }
 
 static void init(void) {
+  autoconf_init();
+  APP_LOG(APP_LOG_LEVEL_DEBUG, "init theme:%d seconds:%d hourdialtype:%d handwidth:%d", getTheme(), getSeconds(), getHourdialtype(), (int)getHandwidth());
+
+  if(getTheme()){
+    BACKGROUND=GColorWhite;
+    FOREGROUND=GColorBlack;
+  } else {
+    BACKGROUND=GColorBlack;
+    FOREGROUND=GColorWhite;
+  }
+
+  if(getHourdialtype()){
+    HOURS=24;
+  } else {
+    HOURS=12;
+  }
+
   // create window
   window = window_create();
   window_set_window_handlers(window, (WindowHandlers) {
@@ -228,9 +247,12 @@ static void init(void) {
   const bool animated = true;
   window_stack_push(window, animated);
   tick_timer_service_subscribe(MINUTE_UNIT, handle_tick);
+
+  app_message_register_inbox_received(in_received_handler);
 }
 
 static void deinit(void) {
+  autoconf_deinit();
   // destroy window
   window_destroy(window);
 }
@@ -240,5 +262,5 @@ int main(void) {
   APP_LOG(APP_LOG_LEVEL_DEBUG, "Done initializing, pushed window: %p", window);
   app_event_loop();
   deinit();
-  return(0 );
+  return(0);
 }

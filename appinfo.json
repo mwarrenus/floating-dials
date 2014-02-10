@@ -1,0 +1,62 @@
+
+{
+    "uuid": "a713c701-7bb1-4e19-9bef-5af215d6fc51",
+    "shortName": "Floating Dials",
+    "longName": "Floating Dials 2.1.0",
+    "versionLabel": "2.1.0",
+    "versionCode": 20100,
+    "companyName": "Koishi Horology",
+    "watchapp": {
+	"watchface": true
+    },
+    "resources": {
+	"media": [
+	    {
+		"menuIcon": true,
+		"type": "png",
+		"name": "IMAGE_MENU_ICON",
+		"file": "images/floating-dials-main-icon.png"
+	    }
+	]
+    },
+    "appKeys": {
+	"theme": 0,
+	"hourdialtype": 1,
+	"seconds": 2,
+	"handwidth": 3
+    },
+    "capabilities": [ "configurable" ],
+    "preferences": {
+	"url" : "http://192.168.10.59:8000",
+	"items": [
+	    {
+		"name":     "theme",
+		"title":    "Theme",
+		"type":     "switch",
+		"switch":  ["dark","light"],
+		"default":  0
+	    },
+	    {
+		"name":     "hourdialtype",
+		"title":    "Hour Dial Type",
+		"type":     "switch",
+		"switch":  ["12h","24h"],
+		"default":  0
+	    },
+	    {
+		"name":   "seconds",
+		"title":  "Display Seconds",
+		"type":   "switch",
+		"switch":  ["off","on"],
+		"default": 0
+	    },
+	    {
+		"name":   "handwidth",
+		"title":  "Hands Width %",
+		"type":   "range",
+		"range": {"min": 1, "max": 25},
+		"default": 25
+	    }
+	]
+    }
+}
