@@ -21,13 +21,11 @@
     },
     "appKeys": {
 	"theme": 0,
-	"hourdialtype": 1,
-	"seconds": 2,
-	"handwidth": 3
+	"hourdialtype": 1
     },
     "capabilities": [ "configurable" ],
     "preferences": {
-	"url" : "http://192.168.10.59:8000",
+	"url" : "http://fugounashi.github.io/floating-dials/autoconfig/2.1.0.html",
 	"items": [
 	    {
 		"name":     "theme",
@@ -42,20 +40,6 @@
 		"type":     "switch",
 		"switch":  ["12h","24h"],
 		"default":  0
-	    },
-	    {
-		"name":   "seconds",
-		"title":  "Display Seconds",
-		"type":   "switch",
-		"switch":  ["off","on"],
-		"default": 0
-	    },
-	    {
-		"name":   "handwidth",
-		"title":  "Hands Width %",
-		"type":   "range",
-		"range": {"min": 1, "max": 25},
-		"default": 25
 	    }
 	]
     }

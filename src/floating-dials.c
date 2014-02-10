@@ -214,14 +214,16 @@ static void window_unload(Window *window) {
 
 static void in_received_handler(DictionaryIterator *iter, void *context) {
   autoconf_in_received_handler(iter, context);
-  APP_LOG(APP_LOG_LEVEL_DEBUG, "in_received_handler theme:%d seconds:%d hourdialtype:%d handwidth:%d", getTheme(), getSeconds(), getHourdialtype(), (int)getHandwidth());
+  //APP_LOG(APP_LOG_LEVEL_DEBUG, "in_received_handler theme:%d seconds:%d hourdialtype:%d handwidth:%d", getTheme(), getSeconds(), getHourdialtype(), (int)getHandwidth());
+  APP_LOG(APP_LOG_LEVEL_DEBUG, "in_received_handler theme:%d hourdialtype:%d ", getTheme(), getHourdialtype());
 
   //update display
 }
 
 static void init(void) {
   autoconf_init();
-  APP_LOG(APP_LOG_LEVEL_DEBUG, "init theme:%d seconds:%d hourdialtype:%d handwidth:%d", getTheme(), getSeconds(), getHourdialtype(), (int)getHandwidth());
+  //APP_LOG(APP_LOG_LEVEL_DEBUG, "init theme:%d seconds:%d hourdialtype:%d handwidth:%d", getTheme(), getSeconds(), getHourdialtype(), (int)getHandwidth());
+  APP_LOG(APP_LOG_LEVEL_DEBUG, "init theme:%d hourdialtype:%d", getTheme(), getHourdialtype());
 
   if(getTheme()){
     BACKGROUND=GColorWhite;
