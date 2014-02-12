@@ -2,9 +2,9 @@
 {
     "uuid": "a713c701-7bb1-4e19-9bef-5af215d6fc51",
     "shortName": "Floating Dials",
-    "longName": "Floating Dials 2.1.0",
-    "versionLabel": "2.1.0",
-    "versionCode": 20100,
+    "longName": "Floating Dials 2.2.0",
+    "versionLabel": "2.2.0",
+    "versionCode": 20200,
     "companyName": "Koishi Horology",
     "watchapp": {
 	"watchface": true
@@ -20,18 +20,19 @@
 	]
     },
     "appKeys": {
-	"theme": 0,
+	"background": 0,
 	"hourdialtype": 1
     },
     "capabilities": [ "configurable" ],
     "preferences": {
-	"url" : "http://fugounashi.github.io/floating-dials/autoconfig/2.1.0.html",
+	"url" : "http://fugounashi.github.io/floating-dials/autoconfig/2.2.0.html",
+	"urlx" : "http://192.168.10.59:8000/",
 	"items": [
 	    {
-		"name":     "theme",
-		"title":    "Theme",
+		"name":     "background",
+		"title":    "Background Colour",
 		"type":     "switch",
-		"switch":  ["dark","light"],
+		"switch":  ["Black","White"],
 		"default":  0
 	    },
 	    {

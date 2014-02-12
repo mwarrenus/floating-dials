@@ -7,7 +7,8 @@ GColor BACKGROUND;
 GColor FOREGROUND;
 
 static Window *window;
-static Layer *minute_dial, *minute_hand, *hour_dial, *hour_hand, *second_dial, *second_hand;
+static Layer *minute_dial, *minute_hand, *hour_dial, *hour_hand;
+  //*second_dial, *second_hand;
 
 GPoint rotate_point(int angle, int max, int radius, GPoint center) {
   GPoint point;
@@ -206,26 +207,30 @@ static void window_unload(Window *window) {
   layer_destroy(minute_hand);
   layer_destroy(hour_dial);
   layer_destroy(hour_hand);
-  layer_destroy(second_dial);
-  layer_destroy(second_hand);
+  //layer_destroy(second_dial);
+  //layer_destroy(second_hand);
   gpath_destroy(hour_hand_path);
   gpath_destroy(minute_hand_path);
 }
 
 static void in_received_handler(DictionaryIterator *iter, void *context) {
   autoconf_in_received_handler(iter, context);
-  //APP_LOG(APP_LOG_LEVEL_DEBUG, "in_received_handler theme:%d seconds:%d hourdialtype:%d handwidth:%d", getTheme(), getSeconds(), getHourdialtype(), (int)getHandwidth());
-  APP_LOG(APP_LOG_LEVEL_DEBUG, "in_received_handler theme:%d hourdialtype:%d ", getTheme(), getHourdialtype());
+  //APP_LOG(APP_LOG_LEVEL_DEBUG, "in_received_handler background:%d seconds:%d hourdialtype:%d handwidth:%d", getBackground(), getSeconds(), getHourdialtype(), (int)getHandwidth());
+  APP_LOG(APP_LOG_LEVEL_DEBUG, "in_received_handler background:%d hourdialtype:%d ", getBackground(), getHourdialtype());
 
   //update display
+  //Layer *window_layer = window_get_root_layer(window);
+  //layer_mark_dirty(window_layer);
+  layer_mark_dirty(hour_dial);
+  layer_mark_dirty(hour_hand);
 }
 
 static void init(void) {
   autoconf_init();
-  //APP_LOG(APP_LOG_LEVEL_DEBUG, "init theme:%d seconds:%d hourdialtype:%d handwidth:%d", getTheme(), getSeconds(), getHourdialtype(), (int)getHandwidth());
-  APP_LOG(APP_LOG_LEVEL_DEBUG, "init theme:%d hourdialtype:%d", getTheme(), getHourdialtype());
+  //APP_LOG(APP_LOG_LEVEL_DEBUG, "init background:%d seconds:%d hourdialtype:%d handwidth:%d", getBackground(), getSeconds(), getHourdialtype(), (int)getHandwidth());
+  APP_LOG(APP_LOG_LEVEL_DEBUG, "init background:%d hourdialtype:%d", getBackground(), getHourdialtype());
 
-  if(getTheme()){
+  if(getBackground()){
     BACKGROUND=GColorWhite;
     FOREGROUND=GColorBlack;
   } else {
