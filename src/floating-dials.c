@@ -214,7 +214,7 @@ static void window_unload(Window *window) {
 }
 
 static void in_received_handler(DictionaryIterator *iter, void *context) {
-  autoconf_in_received_handler(iter, context);
+  autoconfig_in_received_handler(iter, context);
   //APP_LOG(APP_LOG_LEVEL_DEBUG, "in_received_handler background:%d seconds:%d hourdialtype:%d handwidth:%d", getBackground(), getSeconds(), getHourdialtype(), (int)getHandwidth());
   APP_LOG(APP_LOG_LEVEL_DEBUG, "in_received_handler background:%d hourdialtype:%d ", getBackground(), getHourdialtype());
 
@@ -226,7 +226,7 @@ static void in_received_handler(DictionaryIterator *iter, void *context) {
 }
 
 static void init(void) {
-  autoconf_init();
+  autoconfig_init();
   //APP_LOG(APP_LOG_LEVEL_DEBUG, "init background:%d seconds:%d hourdialtype:%d handwidth:%d", getBackground(), getSeconds(), getHourdialtype(), (int)getHandwidth());
   APP_LOG(APP_LOG_LEVEL_DEBUG, "init background:%d hourdialtype:%d", getBackground(), getHourdialtype());
 
@@ -259,7 +259,7 @@ static void init(void) {
 }
 
 static void deinit(void) {
-  autoconf_deinit();
+  autoconfig_deinit();
   // destroy window
   window_destroy(window);
 }
