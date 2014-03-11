@@ -114,9 +114,6 @@ static GPath *minute_hand_path, *hour_hand_path;
 void minute_hand_update(Layer *layer, GContext* gctx) {
   graphics_context_set_fill_color(gctx, FOREGROUND);
   graphics_context_set_stroke_color(gctx, BACKGROUND);
-  //graphics_context_set_fill_color(gctx, BACKGROUND);
-  //graphics_context_set_stroke_color(gctx, FOREGROUND);
-
   time_t now = time(NULL);
   struct tm *time = localtime(&now);
 #ifdef TEST
@@ -128,16 +125,12 @@ void minute_hand_update(Layer *layer, GContext* gctx) {
 #endif
   gpath_draw_filled(gctx, minute_hand_path);
   gpath_draw_outline(gctx, minute_hand_path);
-
   layer_set_bounds(hour_dial,GRect (-hour.x, -hour.y, 144, 168));	
-
 }
 
 void hour_hand_update(Layer *layer, GContext* gctx) {
   graphics_context_set_fill_color(gctx, FOREGROUND);
   graphics_context_set_stroke_color(gctx, BACKGROUND);
-  //graphics_context_set_fill_color(gctx, BACKGROUND);
-  //graphics_context_set_stroke_color(gctx, FOREGROUND);
   time_t now = time(NULL);
   struct tm *time = localtime(&now);
 #ifdef TEST
@@ -173,6 +166,21 @@ static void handle_tick(struct tm *tick_time, TimeUnits units_changed) {
 }
 
 static void window_load(Window *window) {
+
+  if(getBackground()){
+    BACKGROUND=GColorWhite;
+    FOREGROUND=GColorBlack;
+  } else {
+    BACKGROUND=GColorBlack;
+    FOREGROUND=GColorWhite;
+  }
+  if(getHourdialtype()){
+    HOURS=24;
+  } else {
+    HOURS=12;
+  }
+  window_set_background_color(window, BACKGROUND);
+
   // create all layers and gpaths
   Layer *window_layer = window_get_root_layer(window);
   GRect bounds = layer_get_bounds(window_layer);
@@ -219,10 +227,8 @@ static void in_received_handler(DictionaryIterator *iter, void *context) {
   APP_LOG(APP_LOG_LEVEL_DEBUG, "in_received_handler background:%d hourdialtype:%d ", getBackground(), getHourdialtype());
 
   //update display
-  //Layer *window_layer = window_get_root_layer(window);
-  //layer_mark_dirty(window_layer);
-  layer_mark_dirty(hour_dial);
-  layer_mark_dirty(hour_hand);
+  window_unload(window);
+  window_load(window);
 }
 
 static void init(void) {
@@ -230,29 +236,15 @@ static void init(void) {
   //APP_LOG(APP_LOG_LEVEL_DEBUG, "init background:%d seconds:%d hourdialtype:%d handwidth:%d", getBackground(), getSeconds(), getHourdialtype(), (int)getHandwidth());
   APP_LOG(APP_LOG_LEVEL_DEBUG, "init background:%d hourdialtype:%d", getBackground(), getHourdialtype());
 
-  if(getBackground()){
-    BACKGROUND=GColorWhite;
-    FOREGROUND=GColorBlack;
-  } else {
-    BACKGROUND=GColorBlack;
-    FOREGROUND=GColorWhite;
-  }
-
-  if(getHourdialtype()){
-    HOURS=24;
-  } else {
-    HOURS=12;
-  }
-
   // create window
   window = window_create();
   window_set_window_handlers(window, (WindowHandlers) {
     .load = window_load,
     .unload = window_unload,
   });
-  window_set_background_color(window, BACKGROUND);
   const bool animated = true;
   window_stack_push(window, animated);
+  //APP_LOG(APP_LOG_LEVEL_DEBUG, "Done initializing, pushed window: %p", window);
   tick_timer_service_subscribe(MINUTE_UNIT, handle_tick);
 
   app_message_register_inbox_received(in_received_handler);
@@ -260,13 +252,11 @@ static void init(void) {
 
 static void deinit(void) {
   autoconfig_deinit();
-  // destroy window
   window_destroy(window);
 }
 
 int main(void) {
   init();
-  APP_LOG(APP_LOG_LEVEL_DEBUG, "Done initializing, pushed window: %p", window);
   app_event_loop();
   deinit();
   return(0);

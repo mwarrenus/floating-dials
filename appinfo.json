@@ -25,13 +25,15 @@
     },
     "capabilities": [ "configurable" ],
     "preferences": {
+	"description": "Preferences",
+	"embeded": false,
 	"urlx" : "http://fugounashi.github.io/floating-dials/autoconfig/2.2.0.html",
-	"url" : "http://192.168.10.59:8000/",
+	"url" : "http://192.168.10.59:8000/autoconfig.html",
 	"items": [
 	    {
 		"name":     "background",
 		"title":    "Background Colour",
-		"type":     "switch",
+		"type":     "boolean",
 		"off-text": "Black",
 		"on-text":  "White",
 		"default":  false
@@ -39,7 +41,7 @@
 	    {
 		"name":     "hourdialtype",
 		"title":    "Hour Dial Type",
-		"type":     "switch",
+		"type":     "boolean",
 		"off-text": "12h",
 		"on-text":  "24h",
 		"default":  false

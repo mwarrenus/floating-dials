@@ -1,6 +1,10 @@
 #!/bin/sh
 
 cd build
+if [ -f index.html -a ! -f autoconfig.html ]
+then
+  ln -s index.html autoconfig.html
+fi
 python -m SimpleHTTPServer 8000
 
 
