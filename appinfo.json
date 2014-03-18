@@ -28,8 +28,8 @@
 	"description": "Preferences",
 	"embeded": false,
 	"embededx": true,
-	"url" : "http://fugounashi.github.io/floating-dials/autoconfig/2.3.0.html",
-	"urlx" : "http://192.168.10.59:8000/autoconfig.html",
+	"urlx" : "http://fugounashi.github.io/floating-dials/autoconfig/2.4.0.html",
+	"url" : "http://192.168.10.59:8000/autoconfig.html",
 	"items": [
 	    {
 		"name":     "background",

@@ -7,8 +7,7 @@ GColor BACKGROUND;
 GColor FOREGROUND;
 
 static Window *window;
-static Layer *minute_dial, *minute_hand, *hour_dial, *hour_hand;
-  //*second_dial, *second_hand;
+static Layer *minute_dial, *minute_hand, *hour_dial, *hour_hand, *second_dial, *second_hand;
 
 GPoint rotate_point(int angle, int max, int radius, GPoint center) {
   GPoint point;
@@ -28,6 +27,9 @@ GPoint rotate_point(int angle, int max, int radius, GPoint center) {
 #define HOUR_BORDER 1
 #define DIVISOR_MARK_LENGTH 0
 #define HOUR_MARKS 4
+
+#define SECOND_RADIUS 22
+#define SECOND_OFFSET 24
 
 void hour_dial_update(Layer *layer, GContext* gctx) {
   int MAX_HOURS_LABEL;
@@ -109,23 +111,42 @@ void minute_dial_update(Layer *layer, GContext* gctx) {
   }
 }
 
-static GPath *minute_hand_path, *hour_hand_path;
+
+void second_dial_update(Layer *layer, GContext* gctx) {
+  GRect frame=layer_get_frame(layer);
+  GPoint center = grect_center_point(&frame);
+  graphics_context_set_fill_color(gctx, BACKGROUND);
+  int32_t radius = SECOND_RADIUS ;
+  graphics_fill_circle(gctx, center, radius);
+  radius -= HOUR_BORDER;
+  graphics_context_set_stroke_color(gctx, FOREGROUND);
+  graphics_context_set_text_color(gctx, FOREGROUND);
+  for (int angle=0; angle < 60; angle += 5){
+    int32_t length = DIVISOR_MARK_LENGTH;
+    if(angle % 15 == 0) {
+      length = ONE_MARK_LENGTH;
+    } 
+    GPoint outer=rotate_point(angle, 60, radius, center);
+    GPoint inner=rotate_point(angle, 60, radius - length, center);
+    graphics_draw_line(gctx, outer, inner);
+  }
+}
+
+
+static GPath *minute_hand_path, *hour_hand_path, *second_hand_path;
 
 void minute_hand_update(Layer *layer, GContext* gctx) {
   graphics_context_set_fill_color(gctx, FOREGROUND);
   graphics_context_set_stroke_color(gctx, BACKGROUND);
   time_t now = time(NULL);
   struct tm *time = localtime(&now);
-#ifdef TEST
-  gpath_rotate_to(minute_hand_path, TRIG_MAX_ANGLE * time->tm_sec / 60);
-  GPoint hour=rotate_point(time->tm_sec, 60, HOUR_RADIUS, GPoint (0, 0));
-#else
   gpath_rotate_to(minute_hand_path, TRIG_MAX_ANGLE * time->tm_min / 60);
-  GPoint hour=rotate_point(time->tm_min, 60, HOUR_RADIUS, GPoint (0, 0));
-#endif
   gpath_draw_filled(gctx, minute_hand_path);
   gpath_draw_outline(gctx, minute_hand_path);
+  GPoint hour=rotate_point(time->tm_min, 60, HOUR_RADIUS, GPoint (0, 0));
   layer_set_bounds(hour_dial,GRect (-hour.x, -hour.y, 144, 168));	
+  GPoint second=rotate_point((time->tm_min + 15) % 60, 60, SECOND_RADIUS + SECOND_OFFSET, GPoint (0, 0));
+  layer_set_bounds(second_dial,GRect (second.x, second.y, 144, 168));	
 }
 
 void hour_hand_update(Layer *layer, GContext* gctx) {
@@ -143,6 +164,22 @@ void hour_hand_update(Layer *layer, GContext* gctx) {
   gpath_draw_outline(gctx, hour_hand_path);
 }
 
+void second_hand_update(Layer *layer, GContext* gctx) {
+  graphics_context_set_fill_color(gctx, FOREGROUND);
+  time_t now = time(NULL);
+  struct tm *time = localtime(&now);
+  //gpath_rotate_to(second_hand_path, TRIG_MAX_ANGLE * time->tm_sec / 60);
+  //gpath_draw_filled(gctx, second_hand_path);
+  //graphics_context_set_stroke_color(gctx, BACKGROUND);
+  //gpath_draw_outline(gctx, second_hand_path);
+
+  GRect frame=layer_get_frame(layer);
+  GPoint center = grect_center_point(&frame);
+  GPoint outer=rotate_point(time->tm_sec, 60, (SECOND_RADIUS - THREE_MARK_LENGTH), center);
+  graphics_context_set_stroke_color(gctx, FOREGROUND);
+  graphics_draw_line(gctx, outer, center);
+}
+
 static const GPathInfo minute_hand_points = {
   3,
   (GPoint []) {
@@ -157,6 +194,14 @@ static const GPathInfo hour_hand_points = {
     { -(THREE_MARK_LENGTH - HOUR_RADIUS)/4, 0 },
     { (THREE_MARK_LENGTH - HOUR_RADIUS)/4, 0 },
     { 0, (THREE_MARK_LENGTH - HOUR_RADIUS) }
+  }
+};
+static const GPathInfo second_hand_points = {
+  3,
+  (GPoint []) {
+    { -(THREE_MARK_LENGTH - SECOND_RADIUS)/4, 0 },
+    { (THREE_MARK_LENGTH - SECOND_RADIUS)/4, 0 },
+    { 0, (THREE_MARK_LENGTH - SECOND_RADIUS) }
   }
 };
 
@@ -207,6 +252,19 @@ static void window_load(Window *window) {
   hour_hand=layer_create(frame);
   layer_set_update_proc(hour_hand, hour_hand_update);
   layer_add_child(hour_dial, hour_hand);
+
+  my_layer_init(second_dial);
+
+  second_hand_path=gpath_create(&second_hand_points);
+  bounds = layer_get_bounds(second_dial);
+  center = grect_center_point(&bounds);
+  gpath_move_to(second_hand_path, center);
+
+  frame=layer_get_frame(second_dial);
+  second_hand=layer_create(frame);
+  layer_set_update_proc(second_hand, second_hand_update);
+  layer_add_child(second_dial, second_hand);
+
 }
 
 static void window_unload(Window *window) {
@@ -215,10 +273,11 @@ static void window_unload(Window *window) {
   layer_destroy(minute_hand);
   layer_destroy(hour_dial);
   layer_destroy(hour_hand);
-  //layer_destroy(second_dial);
-  //layer_destroy(second_hand);
+  layer_destroy(second_dial);
+  layer_destroy(second_hand);
   gpath_destroy(hour_hand_path);
   gpath_destroy(minute_hand_path);
+  gpath_destroy(second_hand_path);
 }
 
 static void in_received_handler(DictionaryIterator *iter, void *context) {
@@ -245,7 +304,7 @@ static void init(void) {
   const bool animated = true;
   window_stack_push(window, animated);
   //APP_LOG(APP_LOG_LEVEL_DEBUG, "Done initializing, pushed window: %p", window);
-  tick_timer_service_subscribe(MINUTE_UNIT, handle_tick);
+  tick_timer_service_subscribe(SECOND_UNIT, handle_tick);
 
   app_message_register_inbox_received(in_received_handler);
 }
