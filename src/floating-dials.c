@@ -239,24 +239,6 @@ void date_hand_update(Layer *layer, GContext* gctx) {
 }
 
 
-static const GPathInfo minute_hand_points = {
-  3,
-  (GPoint []) {
-    { -(FIFTEEN_MARK_LENGTH - MINUTE_RADIUS) / 4, 0 },
-    { (FIFTEEN_MARK_LENGTH - MINUTE_RADIUS) / 4, 0 },
-    { 0, (FIFTEEN_MARK_LENGTH - MINUTE_RADIUS) }
-  }
-};
-static const GPathInfo hour_hand_points = {
-  3,
-  (GPoint []) {
-    { -(THREE_MARK_LENGTH - HOUR_RADIUS)/4, 0 },
-    { (THREE_MARK_LENGTH - HOUR_RADIUS)/4, 0 },
-    { 0, (THREE_MARK_LENGTH - HOUR_RADIUS) }
-  }
-};
-
-
 static void handle_tick(struct tm *tick_time, TimeUnits units_changed) {
   //APP_LOG(APP_LOG_LEVEL_DEBUG, "handle_tick");
   //APP_LOG(APP_LOG_LEVEL_DEBUG, "handle_tick getSeconds:%d wasseconds:%d", getSeconds(), wasseconds);
@@ -276,9 +258,27 @@ static void handle_tick(struct tm *tick_time, TimeUnits units_changed) {
 }
 
 
+GPathInfo minute_hand_points = {
+    3,
+    (GPoint []) {
+      { -(FIFTEEN_MARK_LENGTH - MINUTE_RADIUS) / 4, 0 },
+      { (FIFTEEN_MARK_LENGTH - MINUTE_RADIUS) / 4, 0 },
+      { 0, (FIFTEEN_MARK_LENGTH - MINUTE_RADIUS) }
+    }
+  };
+  GPathInfo hour_hand_points = {
+    3,
+    (GPoint []) {
+      { -(THREE_MARK_LENGTH - HOUR_RADIUS) / 4, 0 },
+      { (THREE_MARK_LENGTH - HOUR_RADIUS) / 4, 0 },
+      { 0, (THREE_MARK_LENGTH - HOUR_RADIUS) }
+    }
+  };
+
+
 static void window_load(Window *window) {
-  APP_LOG(APP_LOG_LEVEL_DEBUG, "window_load");
-  APP_LOG(APP_LOG_LEVEL_DEBUG, "window_load start getSeconds:%d wasseconds:%d", getSeconds(), wasseconds);
+  //APP_LOG(APP_LOG_LEVEL_DEBUG, "window_load");
+  //APP_LOG(APP_LOG_LEVEL_DEBUG, "window_load start getSeconds:%d wasseconds:%d", getSeconds(), wasseconds);
 
   if(getBackground()){
     BACKGROUND=GColorWhite;
@@ -293,6 +293,12 @@ static void window_load(Window *window) {
     HOURS=12;
   }
   window_set_background_color(window, BACKGROUND);
+
+  int handwidth = getHandwidth();
+  minute_hand_points.points[0].x = -(FIFTEEN_MARK_LENGTH - MINUTE_RADIUS) * handwidth / 100;
+  minute_hand_points.points[1].x = (FIFTEEN_MARK_LENGTH - MINUTE_RADIUS) * handwidth / 100;
+  hour_hand_points.points[0].x = -(THREE_MARK_LENGTH - HOUR_RADIUS) * handwidth / 100;
+  hour_hand_points.points[1].x = (THREE_MARK_LENGTH - HOUR_RADIUS) * handwidth / 100;
 
   // create all layers and gpaths
   Layer *window_layer = window_get_root_layer(window);
@@ -336,11 +342,11 @@ static void window_load(Window *window) {
   layer_add_child(date_dial, date_hand);
 
   if(getSeconds()){
-    APP_LOG(APP_LOG_LEVEL_DEBUG, "window_load seconds true");
+    //APP_LOG(APP_LOG_LEVEL_DEBUG, "window_load seconds true");
     wasseconds = true;
     tick_timer_service_subscribe(SECOND_UNIT, handle_tick);
   } else {
-    APP_LOG(APP_LOG_LEVEL_DEBUG, "window_load seconds false");
+    //APP_LOG(APP_LOG_LEVEL_DEBUG, "window_load seconds false");
     wasseconds = false;
     layer_set_hidden((Layer *)second_dial, true);
     tick_timer_service_subscribe(MINUTE_UNIT, handle_tick);
@@ -351,13 +357,13 @@ static void window_load(Window *window) {
     wasdate = false;
     layer_set_hidden((Layer *)date_dial, true);
   } 
-  APP_LOG(APP_LOG_LEVEL_DEBUG, "window_load end getSeconds:%d wasseconds:%d", getSeconds(), wasseconds);
+  //APP_LOG(APP_LOG_LEVEL_DEBUG, "window_load end getSeconds:%d wasseconds:%d", getSeconds(), wasseconds);
 
 }
 
 static void window_unload(Window *window) {
   //APP_LOG(APP_LOG_LEVEL_DEBUG, "window_unload getSeconds:%d wasseconds:%d", getSeconds(), wasseconds);
-  APP_LOG(APP_LOG_LEVEL_DEBUG, "window_unload");
+  //APP_LOG(APP_LOG_LEVEL_DEBUG, "window_unload");
   // destroy all layers and gpaths
   tick_timer_service_unsubscribe();
   layer_destroy(minute_dial);
@@ -375,7 +381,7 @@ static void window_unload(Window *window) {
 static void in_received_handler(DictionaryIterator *iter, void *context) {
   autoconfig_in_received_handler(iter, context);
   //APP_LOG(APP_LOG_LEVEL_DEBUG, "in_received_handler background:%d seconds:%d hourdialtype:%d handwidth:%d", getBackground(), getSeconds(), getHourdialtype(), (int)getHandwidth());
-  APP_LOG(APP_LOG_LEVEL_DEBUG, "in_received_handler background:%d hourdialtype:%d seconds:%d", getBackground(), getHourdialtype(), getSeconds());
+  //APP_LOG(APP_LOG_LEVEL_DEBUG, "in_received_handler background:%d hourdialtype:%d seconds:%d", getBackground(), getHourdialtype(), getSeconds());
 
   //update display
   // crashfest:
@@ -386,7 +392,7 @@ static void in_received_handler(DictionaryIterator *iter, void *context) {
 static void init(void) {
   autoconfig_init();
   //APP_LOG(APP_LOG_LEVEL_DEBUG, "init background:%d seconds:%d hourdialtype:%d handwidth:%d", getBackground(), getSeconds(), getHourdialtype(), (int)getHandwidth());
-  APP_LOG(APP_LOG_LEVEL_DEBUG, "init background:%d hourdialtype:%d seconds:%d", getBackground(), getHourdialtype(), getSeconds());
+  //APP_LOG(APP_LOG_LEVEL_DEBUG, "init background:%d hourdialtype:%d seconds:%d", getBackground(), getHourdialtype(), getSeconds());
 
   // create window
   window = window_create();
@@ -401,7 +407,7 @@ static void init(void) {
 
 static void deinit(void) {
   //APP_LOG(APP_LOG_LEVEL_DEBUG, "deinit getSeconds:%d wasseconds:%d", getSeconds(), wasseconds);
-  APP_LOG(APP_LOG_LEVEL_DEBUG, "deinit background:%d hourdialtype:%d seconds:%d", getBackground(), getHourdialtype(), getSeconds());
+  //APP_LOG(APP_LOG_LEVEL_DEBUG, "deinit background:%d hourdialtype:%d seconds:%d", getBackground(), getHourdialtype(), getSeconds());
   autoconfig_deinit();
   window_destroy(window);
 }

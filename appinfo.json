@@ -23,15 +23,16 @@
 	"background": 0,
 	"hourdialtype": 1,
 	"seconds": 2,
-	"date": 3
+	"date": 3,
+	"handwidth": 4
     },
     "capabilities": [ "configurable" ],
     "preferences": {
-	"description": "Preferences",
+	"description": "Reload watchface after saving to see changes.",
 	"embeded": false,
 	"embededx": true,
-	"urlx" : "http://fugounashi.github.io/floating-dials/autoconfig/2.4.0.html",
-	"url" : "http://192.168.10.59:8000/autoconfig.html",
+	"url" : "http://fugounashi.github.io/floating-dials/autoconfig/2.4.0.html",
+	"urlx" : "http://192.168.10.59:8000/autoconfig.html",
 	"items": [
 	    {
 		"name":     "background",
@@ -53,17 +54,26 @@
 		"name":     "seconds",
 		"title":    "Seconds Dial",
 		"type":     "boolean",
-		"off-text": "off",
-		"on-text":  "on",
+		"off-text": "Off",
+		"on-text":  "On",
 		"default":  true
 	    },
 	    {
 		"name":     "date",
-		"title":    "Date Dial",
+		"title":    "Day / Date Dial",
 		"type":     "boolean",
-		"off-text": "off",
-		"on-text":  "on",
+		"off-text": "Off",
+		"on-text":  "On",
 		"default":  true
+	    },
+	    {
+		"name":     "handwidth",
+		"title":    "Hand Width",
+		"type":     "integer",
+		"description": "10-35% of hand length.",
+		"min": 10,
+		"max":  35,
+		"default":  20
 	    }
 	]
     }
