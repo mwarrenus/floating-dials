@@ -2,9 +2,9 @@
 {
     "uuid": "a713c701-7bb1-4e19-9bef-5af215d6fc51",
     "shortName": "Floating Dials",
-    "longName": "Floating Dials 2.3.0",
-    "versionLabel": "2.3.0",
-    "versionCode": 20300,
+    "longName": "Floating Dials 2.4.0",
+    "versionLabel": "2.4.0",
+    "versionCode": 20400,
     "companyName": "Koishi Horology",
     "watchapp": {
 	"watchface": true
@@ -21,7 +21,9 @@
     },
     "appKeys": {
 	"background": 0,
-	"hourdialtype": 1
+	"hourdialtype": 1,
+	"seconds": 2,
+	"date": 3
     },
     "capabilities": [ "configurable" ],
     "preferences": {
@@ -46,6 +48,22 @@
 		"off-text": "12h",
 		"on-text":  "24h",
 		"default":  false
+	    },
+	    {
+		"name":     "seconds",
+		"title":    "Seconds Dial",
+		"type":     "boolean",
+		"off-text": "off",
+		"on-text":  "on",
+		"default":  true
+	    },
+	    {
+		"name":     "date",
+		"title":    "Date Dial",
+		"type":     "boolean",
+		"off-text": "off",
+		"on-text":  "on",
+		"default":  true
 	    }
 	]
     }
