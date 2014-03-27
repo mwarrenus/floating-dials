@@ -29,10 +29,11 @@ GPoint rotate_point(int angle, int max, int radius, GPoint center) {
 #define HOUR_MARKS 4
 
 #define SECOND_RADIUS 22
-#define SECOND_OFFSET 24
+#define SECOND_OFFSET 25
 
 bool wasseconds = false;
 bool wasdate = false;
+bool wascontrast = false;
 
 void hour_dial_update(Layer *layer, GContext* gctx) {
   int MAX_HOURS_LABEL;
@@ -86,12 +87,20 @@ void hour_dial_update(Layer *layer, GContext* gctx) {
 
 void minute_dial_update(Layer *layer, GContext* gctx) {
   static char minute_text[] = "59";
-  graphics_context_set_stroke_color(gctx, FOREGROUND);
-  graphics_context_set_text_color(gctx, FOREGROUND);
+  GColor foreground=FOREGROUND;
+  GColor background=BACKGROUND;
+  if(wascontrast){
+    foreground=BACKGROUND;
+    background=FOREGROUND;
+  }
+  graphics_context_set_fill_color(gctx, background);
+  graphics_context_set_stroke_color(gctx, foreground);
+  graphics_context_set_text_color(gctx, foreground);
   GRect frame=layer_get_frame(layer);
   GPoint center = grect_center_point(&frame);
+  int32_t radius = MINUTE_RADIUS ;
+  graphics_fill_circle(gctx, center, radius);
   for (int angle=0; angle < 60; angle++){
-    int32_t radius = MINUTE_RADIUS ;
     int32_t length;
     if(angle % 15 == 0){
       length = FIFTEEN_MARK_LENGTH;
@@ -174,14 +183,20 @@ void date_dial_update(Layer *layer, GContext* gctx) {
 static GPath *minute_hand_path, *hour_hand_path;
 
 void minute_hand_update(Layer *layer, GContext* gctx) {
-  graphics_context_set_fill_color(gctx, FOREGROUND);
-  graphics_context_set_stroke_color(gctx, BACKGROUND);
+  GColor background=BACKGROUND;
+  GColor foreground=FOREGROUND;
+  if(wascontrast){
+    background=FOREGROUND;
+    foreground=BACKGROUND;
+  }
+  graphics_context_set_fill_color(gctx, foreground);
+  graphics_context_set_stroke_color(gctx, background);
   time_t now = time(NULL);
   struct tm *time = localtime(&now);
   gpath_rotate_to(minute_hand_path, TRIG_MAX_ANGLE * time->tm_min / 60);
   gpath_draw_filled(gctx, minute_hand_path);
   gpath_draw_outline(gctx, minute_hand_path);
-  GPoint hour=rotate_point(time->tm_min, 60, HOUR_RADIUS, GPoint (0, 0));
+  GPoint hour=rotate_point(time->tm_min, 60, HOUR_RADIUS /*+ 1*/, GPoint (0, 0));
   layer_set_bounds(hour_dial,GRect (-hour.x, -hour.y, 144, 168));	
   GPoint second=rotate_point((time->tm_min + 15) % 60, 60, SECOND_RADIUS + SECOND_OFFSET, GPoint (0, 0));
   layer_set_bounds(second_dial,GRect (second.x, second.y, 144, 168));	
@@ -293,6 +308,8 @@ static void window_load(Window *window) {
     HOURS=12;
   }
   window_set_background_color(window, BACKGROUND);
+
+  wascontrast=getContrast();
 
   int handwidth = getHandwidth();
   minute_hand_points.points[0].x = -(FIFTEEN_MARK_LENGTH - MINUTE_RADIUS) * handwidth / 100;
