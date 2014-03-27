@@ -158,6 +158,16 @@ void date_dial_update(Layer *layer, GContext* gctx) {
     GPoint inner=rotate_point(angle, 32, radius - length, center);
     graphics_draw_line(gctx, outer, inner);
   }
+  radius = SECOND_RADIUS / 2;
+  for (int angle=0; angle < 7; angle += 1){
+    int32_t length = DIVISOR_MARK_LENGTH;
+    if((angle == 0) || (angle == 6) ) {
+      length = ONE_MARK_LENGTH;
+    } 
+    GPoint outer=rotate_point(angle, 7, radius, center);
+    GPoint inner=rotate_point(angle, 7, radius - length, center);
+    graphics_draw_line(gctx, outer, inner);
+  }
 }
 
 
@@ -221,6 +231,9 @@ void date_hand_update(Layer *layer, GContext* gctx) {
   GRect frame=layer_get_frame(layer);
   GPoint center = grect_center_point(&frame);
   GPoint outer=rotate_point(time->tm_mday, 32, (SECOND_RADIUS - THREE_MARK_LENGTH), center);
+  graphics_context_set_stroke_color(gctx, FOREGROUND);
+  graphics_draw_line(gctx, outer, center);
+  outer=rotate_point(time->tm_wday, 7, ((SECOND_RADIUS / 2) - THREE_MARK_LENGTH), center);
   graphics_context_set_stroke_color(gctx, FOREGROUND);
   graphics_draw_line(gctx, outer, center);
 }
