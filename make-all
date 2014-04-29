@@ -4,13 +4,13 @@
 APP="floating-dials"
 APPNAME="Floating Dials"
 MAJOR="2"
-MINOR="0"
+MINOR="6"
 REV="0"
 
 if [ "$#" = 0 ] 
 then
     # edit this: 
-    set - "main" "24h" "test" 
+    set - "pro" 
 fi
 
 config="src/config.h"
@@ -21,34 +21,47 @@ do
 
     case "$f" in
     # edit this:
-	"main")
+	"pro")
+	    UUID="a713c701-7bb1-4e19-9bef-5af215d6fc54"
+	    shortname="$APPNAME Pro"
+	    echo '#define CONFIGURABLE "capabilities": [ "configurable" ],' >> "$config"
+	    ;;
+	"free")
 	    UUID="a713c701-7bb1-4e19-9bef-5af215d6fc51"
+	    shortname="$APPNAME Free"
+	    echo '#define CONFIGURABLE' >> "$config"
 	    ;;
-
-	"24h")
-	    UUID="a713c701-7bb1-4e19-9bef-5af215d6fc52"
-	    echo "#define TWENTYFOUR true" >> "$config"
-	    ;;
-	"test")
-	    UUID="a713c701-7bb1-4e19-9bef-5af215d6fc53"
-	    echo "#define TEST" >> "$config"
-	    ;;    
     esac
 
-    if [ "$f" = "main" ]
-    then
-	shortname="$APPNAME"
-    else
-	shortname="$APPNAME $f"
-    fi
     version="$MAJOR.$MINOR.$REV"
     versioncode=`expr "$MAJOR" '*' '10000' '+' "$MINOR" '*' '100' '+' "$REV"`
     echo "#define UUID \"$UUID\"" >> "$config"
     echo "#define VERSION \"$version\"" >> "$config"
     echo "#define VERSIONCODE $versioncode" >> "$config"
-    echo "#define ICON \"images/$APP-$f-icon.png\"" >> "$config"
     echo "#define SHORTNAME \"$shortname\"" >> "$config"
     echo "#define LONGNAME \"$shortname $version\"" >> "$config"
     cpp appinfo.json.cpp | grep -v '^#' > appinfo.json
-    pebble build && mv "build/$APP.pbw" "build/$APP-$f-$version.pbw"
+
+    if [ "$f" = "free" ]
+    then
+	rm wscript wtools 
+	ln -s wscript.orig wscript
+	cp build/autoconfig.c build/autoconfig.h src
+	pebble clean
+    fi
+
+    pebble build && mv "build/$APP.pbw" "built/$APP-$f-$version.pbw"
+
+    if [ "$f" = "free" ]
+    then
+	rm wscript 
+	ln -s wscript.autoconfig wscript
+	ln -s wtools.autoconfig wtools
+	rm src/autoconfig.c src/autoconfig.h
+	pebble clean
+    fi
+
 done
+
+
+

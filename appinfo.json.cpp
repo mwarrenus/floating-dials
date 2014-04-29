@@ -1,10 +1,12 @@
+#include "src/config.h"
 
 {
-    "uuid": "a713c701-7bb1-4e19-9bef-5af215d6fc51",
-    "shortName": "Floating Dials",
-    "longName": "Floating Dials 2.5.0",
-    "versionLabel": "2.5.0",
-    "versionCode": 20500,
+    "uuid": UUID,
+    "shortName": SHORTNAME,
+    "longName": LONGNAME,
+    CONFIGURABLE
+    "versionLabel": VERSION,
+    "versionCode": VERSIONCODE,
     "companyName": "Koishi Horology",
     "watchapp": {
 	"watchface": true
@@ -27,13 +29,12 @@
 	"handwidth": 4,
 	"contrast": 5
     },
-    "capabilities": [ "configurable" ],
     "preferences": {
 	"description": "Reload watchface after saving to see changes.",
 	"embeded": false,
 	"embededx": true,
 	"url" : "http://fugounashi.github.io/floating-dials/autoconfig/2.5.0.html",
-	"urlx" : "http://192.168.10.59:8000/autoconfig.html",
+	"xurl" : "http://192.168.10.59:8000/autoconfig.html",
 	"items": [
 	    {
 		"name":     "background",

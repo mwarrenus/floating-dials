@@ -1,3 +1,8 @@
+// 2.5.0: configurable, in pb, thought js was bundled but looks like it wont have been
+// 2.5.1: non-js version published in app store
+// 2.6.0-pro: changed uuid to 54 so can have unpublished version for javascript extraction and published non-js version
+// 2.6.0-free: non-js version with original 51 uuid
+
 #include <pebble.h>
 #include "autoconfig.h"
 
