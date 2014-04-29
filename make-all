@@ -4,8 +4,8 @@
 APP="floating-dials"
 APPNAME="Floating Dials"
 MAJOR="2"
-MINOR="6"
-REV="1"
+MINOR="7"
+REV="0"
 
 if [ "$#" = 0 ] 
 then

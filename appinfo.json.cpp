@@ -32,9 +32,8 @@
     "preferences": {
 	"description": "Reload watchface after saving to see changes.",
 	"embeded": false,
-	"embededx": true,
-	"url" : "http://fugounashi.github.io/floating-dials/autoconfig/2.5.0.html",
-	"xurl" : "http://192.168.10.59:8000/autoconfig.html",
+	"xurl" : "http://fugounashi.github.io/floating-dials/autoconfig/2.7.0.html",
+	"url" : "http://192.168.10.59:8000/autoconfig.html",
 	"items": [
 	    {
 		"name":     "background",
@@ -63,10 +62,22 @@
 	    {
 		"name":     "seconds",
 		"title":    "Seconds Dial",
-		"type":     "boolean",
-		"off-text": "Off",
-		"on-text":  "On",
-		"default":  true
+		"type": "enum",
+		"choices": {
+		  "OFF": "Off",
+		  "ON": "On",
+		  "TAP": "Tap to toggle On / Off"
+		},
+		"default": 1
+	    },
+	    {
+		"name":     "taptimeout",
+		"title":    "Tap Timeout",
+		"type":     "integer",
+		"description": "Minutes after tap to automatically turn seconds dial off.  0 to disable.",
+		"min": 0,
+		"max": 60,
+		"default": 5
 	    },
 	    {
 		"name":     "date",

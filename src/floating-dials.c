@@ -296,6 +296,30 @@ GPathInfo minute_hand_points = {
   };
 
 
+void seconds_on(){
+    wasseconds = true;
+    layer_set_hidden((Layer *)second_dial, false);
+    tick_timer_service_subscribe(SECOND_UNIT, handle_tick);
+}
+
+void seconds_off(){
+    wasseconds = false;
+    layer_set_hidden((Layer *)second_dial, true);
+    tick_timer_service_subscribe(MINUTE_UNIT, handle_tick);
+} 
+
+
+
+ 
+void accel_tap_handler(AccelAxisType axis, int32_t direction) {
+  // Process tap on ACCEL_AXIS_X, ACCEL_AXIS_Y or ACCEL_AXIS_Z
+  // Direction is 1 or -1
+  if (getSeconds() == SECONDS_TAP) {
+    wasseconds ? seconds_off() : seconds_on();
+  }
+}
+
+
 static void window_load(Window *window) {
   //APP_LOG(APP_LOG_LEVEL_DEBUG, "window_load");
   //APP_LOG(APP_LOG_LEVEL_DEBUG, "window_load start getSeconds:%d wasseconds:%d", getSeconds(), wasseconds);
@@ -363,15 +387,10 @@ static void window_load(Window *window) {
   layer_set_update_proc(date_hand, date_hand_update);
   layer_add_child(date_dial, date_hand);
 
-  if(getSeconds()){
-    //APP_LOG(APP_LOG_LEVEL_DEBUG, "window_load seconds true");
-    wasseconds = true;
-    tick_timer_service_subscribe(SECOND_UNIT, handle_tick);
+  if(getSeconds() == SECONDS_ON ){
+    seconds_on();
   } else {
-    //APP_LOG(APP_LOG_LEVEL_DEBUG, "window_load seconds false");
-    wasseconds = false;
-    layer_set_hidden((Layer *)second_dial, true);
-    tick_timer_service_subscribe(MINUTE_UNIT, handle_tick);
+    seconds_off();
   } 
   if(getDate()){
     wasdate = true;
@@ -379,6 +398,7 @@ static void window_load(Window *window) {
     wasdate = false;
     layer_set_hidden((Layer *)date_dial, true);
   } 
+  accel_tap_service_subscribe(&accel_tap_handler);
   //APP_LOG(APP_LOG_LEVEL_DEBUG, "window_load end getSeconds:%d wasseconds:%d", getSeconds(), wasseconds);
 
 }
@@ -387,6 +407,7 @@ static void window_unload(Window *window) {
   //APP_LOG(APP_LOG_LEVEL_DEBUG, "window_unload getSeconds:%d wasseconds:%d", getSeconds(), wasseconds);
   //APP_LOG(APP_LOG_LEVEL_DEBUG, "window_unload");
   // destroy all layers and gpaths
+  accel_tap_service_unsubscribe();
   tick_timer_service_unsubscribe();
   layer_destroy(minute_dial);
   layer_destroy(minute_hand);
@@ -399,6 +420,7 @@ static void window_unload(Window *window) {
   layer_destroy(date_dial);
   layer_destroy(date_hand);
 }
+
 
 static void in_received_handler(DictionaryIterator *iter, void *context) {
   autoconfig_in_received_handler(iter, context);
