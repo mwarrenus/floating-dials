@@ -296,19 +296,30 @@ GPathInfo minute_hand_points = {
   };
 
 
-void seconds_on(){
-    wasseconds = true;
-    layer_set_hidden((Layer *)second_dial, false);
-    tick_timer_service_subscribe(SECOND_UNIT, handle_tick);
-}
+AppTimer *app_timer_handle;
+
 
 void seconds_off(){
     wasseconds = false;
     layer_set_hidden((Layer *)second_dial, true);
     tick_timer_service_subscribe(MINUTE_UNIT, handle_tick);
-} 
+    app_timer_cancel(app_timer_handle);
+}
 
 
+void app_timer_callback(void *data) {
+  seconds_off();
+}
+
+
+void seconds_on(){
+    wasseconds = true;
+    layer_set_hidden((Layer *)second_dial, false);
+    tick_timer_service_subscribe(SECOND_UNIT, handle_tick);
+    if (getSeconds() == SECONDS_TAP && getTaptimeout() != 0) {
+      app_timer_handle = app_timer_register(getTaptimeout() * 60 * 1000, (AppTimerCallback) app_timer_callback, NULL);
+    }
+}
 
  
 void accel_tap_handler(AccelAxisType axis, int32_t direction) {

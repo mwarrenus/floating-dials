@@ -27,13 +27,14 @@
 	"seconds": 2,
 	"date": 3,
 	"handwidth": 4,
-	"contrast": 5
+	"contrast": 5,
+	"taptimeout": 6
     },
     "preferences": {
 	"description": "Reload watchface after saving to see changes.",
 	"embeded": false,
-	"xurl" : "http://fugounashi.github.io/floating-dials/autoconfig/2.7.0.html",
-	"url" : "http://192.168.10.59:8000/autoconfig.html",
+	"url" : "http://fugounashi.github.io/floating-dials/autoconfig/2.7.0.html",
+	"xurl" : "http://192.168.10.59:8000/autoconfig.html",
 	"items": [
 	    {
 		"name":     "background",
@@ -68,7 +69,7 @@
 		  "ON": "On",
 		  "TAP": "Tap to toggle On / Off"
 		},
-		"default": 1
+		"default": 2
 	    },
 	    {
 		"name":     "taptimeout",
