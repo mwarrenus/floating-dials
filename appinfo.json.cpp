@@ -33,7 +33,7 @@
     "preferences": {
 	"description": "Reload watchface after saving to see changes.",
 	"embeded": false,
-	"url" : "http://fugounashi.github.io/floating-dials/autoconfig/2.7.0.html",
+	"url" : "http://fugounashi.github.io/floating-dials/autoconfig/2.8.0.html",
 	"xurl" : "http://192.168.10.59:8000/autoconfig.html",
 	"items": [
 	    {
@@ -72,21 +72,24 @@
 		"default": 2
 	    },
 	    {
+		"name":     "date",
+		"title":    "Day / Date Dial",
+		"type":     "enum",
+		"choices": {
+		  "OFF": "Off",
+		  "ON": "On",
+		  "TAP": "Tap to toggle On / Off"
+		},
+		"default": 2
+	    },
+	    {
 		"name":     "taptimeout",
 		"title":    "Tap Timeout",
 		"type":     "integer",
-		"description": "Minutes after tap to automatically turn seconds dial off.  0 to disable.",
+		"description": "Minutes after tap to automatically turn dial off.  0 to disable.",
 		"min": 0,
 		"max": 60,
 		"default": 5
-	    },
-	    {
-		"name":     "date",
-		"title":    "Day / Date Dial",
-		"type":     "boolean",
-		"off-text": "Off",
-		"on-text":  "On",
-		"default":  true
 	    },
 	    {
 		"name":     "handwidth",

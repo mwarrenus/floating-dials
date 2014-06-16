@@ -4,7 +4,7 @@
 APP="floating-dials"
 APPNAME="Floating Dials"
 MAJOR="2"
-MINOR="7"
+MINOR="8"
 REV="0"
 
 if [ "$#" = 0 ] 
@@ -50,7 +50,7 @@ do
 	pebble clean
     fi
 
-    pebble build && mv "build/$APP.pbw" "tmp/$APP-$f-$version.pbw"
+    pebble build && cp "build/$APP.pbw" "tmp/$APP-$f-$version.pbw"
 
     if [ "$f" = "free" ]
     then

@@ -2,6 +2,8 @@
 // 2.5.1: non-js version published in app store
 // 2.6.0-pro: changed uuid to 54 so can have unpublished version for javascript extraction and published non-js version
 // 2.6.0-free: non-js version with original 51 uuid
+// 2.7.0: tap seconds
+// 2.8.0: tap date
 
 #include <pebble.h>
 #include "autoconfig.h"
@@ -39,6 +41,7 @@ GPoint rotate_point(int angle, int max, int radius, GPoint center) {
 bool wasseconds = false;
 bool wasdate = false;
 bool wascontrast = false;
+bool wastap = false;
 
 void hour_dial_update(Layer *layer, GContext* gctx) {
   int MAX_HOURS_LABEL;
@@ -296,19 +299,33 @@ GPathInfo minute_hand_points = {
   };
 
 
-AppTimer *app_timer_handle;
+AppTimer *app_timer_handle = NULL;
 
 
 void seconds_off(){
     wasseconds = false;
     layer_set_hidden((Layer *)second_dial, true);
     tick_timer_service_subscribe(MINUTE_UNIT, handle_tick);
-    app_timer_cancel(app_timer_handle);
+}
+void date_off(){
+    wasdate = false;
+    layer_set_hidden((Layer *)date_dial, true);
 }
 
 
+void tap_off(){
+    wastap = false;
+    app_timer_cancel(app_timer_handle);
+    if (getSeconds() == SECONDS_TAP) {
+      seconds_off();
+    }
+    if (getDate() == DATE_TAP) {
+      date_off();
+    }
+}
+
 void app_timer_callback(void *data) {
-  seconds_off();
+  tap_off();
 }
 
 
@@ -316,8 +333,22 @@ void seconds_on(){
     wasseconds = true;
     layer_set_hidden((Layer *)second_dial, false);
     tick_timer_service_subscribe(SECOND_UNIT, handle_tick);
-    if (getSeconds() == SECONDS_TAP && getTaptimeout() != 0) {
+}
+void date_on(){
+    wasdate = true;
+    layer_set_hidden((Layer *)date_dial, false);
+}
+
+void tap_on(){
+    wastap = true;
+    if ((getSeconds() == SECONDS_TAP || getDate() == DATE_TAP) && getTaptimeout() != 0) {
       app_timer_handle = app_timer_register(getTaptimeout() * 60 * 1000, (AppTimerCallback) app_timer_callback, NULL);
+    }
+    if (getSeconds() == SECONDS_TAP) {
+      wasseconds ? seconds_off() : seconds_on();
+    }
+    if (getDate() == DATE_TAP) {
+      wasdate ? date_off() : date_on();
     }
 }
 
@@ -325,8 +356,8 @@ void seconds_on(){
 void accel_tap_handler(AccelAxisType axis, int32_t direction) {
   // Process tap on ACCEL_AXIS_X, ACCEL_AXIS_Y or ACCEL_AXIS_Z
   // Direction is 1 or -1
-  if (getSeconds() == SECONDS_TAP) {
-    wasseconds ? seconds_off() : seconds_on();
+  if (getSeconds() == SECONDS_TAP || getDate() == DATE_TAP) {
+    wastap ? tap_off() : tap_on();
   }
 }
 
@@ -403,12 +434,12 @@ static void window_load(Window *window) {
   } else {
     seconds_off();
   } 
-  if(getDate()){
-    wasdate = true;
+  if(getDate() == DATE_ON ){
+    date_on();
   } else {
-    wasdate = false;
-    layer_set_hidden((Layer *)date_dial, true);
+    date_off();
   } 
+
   accel_tap_service_subscribe(&accel_tap_handler);
   //APP_LOG(APP_LOG_LEVEL_DEBUG, "window_load end getSeconds:%d wasseconds:%d", getSeconds(), wasseconds);
 
